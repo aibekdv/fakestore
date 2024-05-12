@@ -7,7 +7,7 @@ String productModelToJson(ProductModel data) => json.encode(data.toJson());
 class ProductModel {
     int? id;
     String? title;
-    String? price;
+    num? price;
     String? category;
     String? description;
     String? image;
