@@ -1,5 +1,10 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:fakestore/features/auth/domain/models/user_model.dart';
+import 'package:fakestore/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+@RoutePage()
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -11,6 +16,7 @@ class _SignUpPageState extends State<SignUpPage> {
   bool isFirstPasswordHidden = true;
   bool isSecondPasswordHidden = true;
   TextEditingController emailTextInputController = TextEditingController();
+  TextEditingController userNameTextInputController = TextEditingController();
   TextEditingController passwordTextInputController = TextEditingController();
   TextEditingController passwordTextRepeatInputController =
       TextEditingController();
@@ -21,6 +27,7 @@ class _SignUpPageState extends State<SignUpPage> {
     emailTextInputController.dispose();
     passwordTextInputController.dispose();
     passwordTextRepeatInputController.dispose();
+    userNameTextInputController.dispose();
     super.dispose();
   }
 
@@ -44,16 +51,39 @@ class _SignUpPageState extends State<SignUpPage> {
                 TextFormField(
                   controller: emailTextInputController,
                   // validator: () {},
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите Email';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      hintText: 'Введите Email'),
+                    contentPadding: const EdgeInsets.only(left: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    hintText: 'Введите Email',
+                  ),
                 ),
-                const SizedBox(
-                  height: 30,
+                const SizedBox(height: 30),
+                TextFormField(
+                  controller: userNameTextInputController,
+                  // validator: () {},
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    hintText: 'Введите никнейм',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите никнейм';
+                    }
+                    return null;
+                  },
                 ),
+                const SizedBox(height: 30),
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   obscureText: isFirstPasswordHidden,
@@ -98,25 +128,62 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(
                   height: 30,
                 ),
-                SizedBox(
-                    height: 40,
-                    width: double.infinity,
-                    child: ElevatedButton(
+                BlocConsumer<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    if (state is RegisterSuccess) {
+                      context.maybePop();
+                    } else if (state is RegisterError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("Ошибка регистрации: неизвестная ошибка"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    return SizedBox(
+                      height: 40,
+                      width: double.infinity,
+                      child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue),
-                        onPressed: () {},
-                        child: const Text(
-                          'Регистрация',
-                          style: TextStyle(color: Colors.white),
-                        ))),
+                        onPressed: () {
+                          if (formkey.currentState!.validate()) {
+                            context.read<AuthCubit>().register(UserModel(
+                                  email: emailTextInputController.text,
+                                  password: passwordTextInputController.text,
+                                  name: UserNameModel(
+                                    firstname: userNameTextInputController.text,
+                                  ),
+                                ));
+                          }
+                        },
+                        child: state is RegisterLoading
+                            ? const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Регистрация',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
                     'Войти',
                     style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline),
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ],

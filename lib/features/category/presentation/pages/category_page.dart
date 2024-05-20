@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:fakestore/features/cart/presentation/pages/cart_screen.dart';
 import 'package:fakestore/features/category/domain/models/product_model.dart';
 import 'package:fakestore/features/category/presentation/cubit/category/category_cubit.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'product_detail_page.dart';
 
+@RoutePage()
 class CategoryPage extends StatefulWidget {
   final String category;
   const CategoryPage({super.key, required this.category});

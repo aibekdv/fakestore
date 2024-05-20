@@ -1,8 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:fakestore/features/category/presentation/cubit/category/category_cubit.dart';
 import 'package:fakestore/features/category/presentation/pages/category_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+@RoutePage()
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
 
